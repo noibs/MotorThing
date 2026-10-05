@@ -1,0 +1,25 @@
+[
+    {
+        "label": "Pico: run current file",
+        "command": "uv",
+        "args": ["run", "mpremote", "mount", ".", "run", "$ZED_FILE"],
+        "cwd": "$ZED_WORKTREE_ROOT",
+        "tags": ["python-module-main-method"],
+        "use_new_terminal": false,
+        "allow_concurrent_runs": true,
+    },
+    {
+        "label": "Pico: save as main.py",
+        "command": "uv",
+        "args": [
+            "run",
+            "mpremote",
+            "cp",
+            "$ZED_FILE",
+            ":main.py",
+            "+",
+            "reset",
+        ],
+        "cwd": "$ZED_WORKTREE_ROOT",
+    },
+]
