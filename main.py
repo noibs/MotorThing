@@ -3,50 +3,26 @@
 
 from stepper_motor import StepperMotor
 
-motor = StepperMotor([16, 17, 18, 19], pwm_pct=0.5)
-motor.set_step_mode("full")
-
-"""Move stepper test"""
-motor.move_stepper(8, "forward", delay=0.3)
-print("total_steps:", motor.total_steps)    # expect 8
-
-motor.move_stepper(8, "backward", delay=0.3)
-print("total_steps:", motor.total_steps)    # expect 0
-
-
-"""Continuous test
-motor.rotate_continuous("forward", delay=0.2)
-print("After continuous:", motor.total_steps)
-"""
-
-"""Half step test
-motor = StepperMotor([16, 17, 18, 19], pwm_pct=0.5)
-motor.set_step_mode("half")
+motor = StepperMotor([0, 1, 2, 3], pwm_pct=0.5, frequency=18_000)
 
 try:
-    for pct in [0.25, 0.5, 1.0]:
-        motor.pwm_pct = pct
-        print("PWM =", int(pct * 100), "%")
+    # Half step: 400 half steps = one full turn forward
+    motor.set_step_mode("half")
+    motor.move_stepper(400, "forward", delay=0.01)
+    print("After half step:", motor.total_steps)
 
-        print("  forward")
-        motor.move_stepper(8, "forward", delay=0.4)      # all 8 states
-        print("  total_steps:", motor.total_steps)
+    # Microstep with 8 microsteps per full step: 1600 steps = one full turn back
+    motor.set_step_mode("micro", 8)
+    motor.move_stepper(1600, "backward", delay=0.002)
+    print("After microstep:", motor.total_steps)
 
-        print("  backward")
-        motor.move_stepper(8, "backward", delay=0.4)     # all 8 in reverse
-        print("  total_steps:", motor.total_steps)
+    # Full step: 200 full steps = one full turn forward
+    motor.set_step_mode("full")
+    motor.move_stepper(200, "forward", delay=0.01)
+    print("After full step:", motor.total_steps)
 
-        time.sleep(1)    # pause between settings
+    # Continuous rotation until Ctrl+C
+    motor.rotate_continuous("forward", delay=0.01)
+
 finally:
     motor.stop()
-"""
-
-"""Switch between full/half test
-motor.set_step_mode("full")
-motor.move_stepper(4, "forward", delay=0.4)
-motor.set_step_mode("half")
-motor.move_stepper(8, "forward", delay=0.4)
-print(motor.total_steps)    # 4 + 8 = 12 more than beforeL
-"""
-
-motor.stop()
