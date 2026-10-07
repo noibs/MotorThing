@@ -2,7 +2,9 @@
 name = "motor"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "micropython-rp2-stubs>=1.29.0.post1",
+]
 
 [dependency-groups]
 dev = [

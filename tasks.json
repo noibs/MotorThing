@@ -32,4 +32,10 @@
         "args": ["run", "mpremote", "ls"],
         "cwd": "$ZED_WORKTREE_ROOT",
     },
+    {
+        "label": "Pico: REPL with project",
+        "command": "uv",
+        "args": ["run", "mpremote", "mount", ".", "repl"],
+        "cwd": "$ZED_WORKTREE_ROOT",
+    },
 ]
