@@ -56,8 +56,9 @@ class StepperMotor:
 
     def set_step(self, state):
         """Apply one sequence state to the four outputs."""
+        # zip pairs each output with its value from the row, so output 1 gets the first number and so on
         for output, level in zip(self.outputs, state):
-            # Here we multiply with pwm to get the right number
+            # duty_u16 goes from 0 to 65535 (100%), so we scale the 0-1 level by pwm_pct and then by 65535
             output.duty_u16(int(level * self.pwm_pct * 65535))
 
     def stop(self):
@@ -80,7 +81,8 @@ class StepperMotor:
         """Move one row forward or backward"""
         self.index += sign
 
-        # Wrap around at end of sequence
+        # Wraps around at end of sequence
+        # so the sequence just loops in both directions
         if self.index >= len(self.sequence):
             self.index = 0
         if self.index < 0:
@@ -100,14 +102,17 @@ class StepperMotor:
 
         # We make sure microsteps is valid number
         if not isinstance(microsteps, int) or microsteps < 1:
-            raise ValueError("microsteps must be 0 or positive integer")
+            raise ValueError("microsteps must be a positive integer")
 
         sequence = []
+        # One electrical cycle is 4 full steps (same as the 4 rows in "full"), so we need 4 microsteps rows
         n = 4 * microsteps
 
         for k in range(n):
+            # Split one full circle into n equal parts, this is where we are in the cycle
             angle = 2 * math.pi * k / n
 
+            # cos for coil A and sin for coil B, this makes the field rotate smoothly with the same strength
             a = round(math.cos(angle), 4)
             b = round(math.sin(angle), 4)
 
@@ -139,6 +144,7 @@ class StepperMotor:
         if mode == "micro":
             if microsteps is None:
                 raise ValueError("micro needs microstep value")
+            # Save it under its own name like "micro_8" so we don't overwrite full or half
             name = "micro_" + str(microsteps)
             self.sequences[name] = self.generate_microstep_sequence(microsteps)
             mode = name
@@ -160,7 +166,7 @@ class StepperMotor:
         if not isinstance(steps, int) or steps < 0:
             raise ValueError("steps must be 0 or positive integer")
 
-        # We make sure specified delay does not go under 0.002
+        # We make sure specified delay does not go under 0.002, if it does we overwrite with min_delay
         delay = max(delay, self.MIN_DELAY)
 
         try:
@@ -178,9 +184,11 @@ class StepperMotor:
 
         print("Rotating", direction)
         try:
+            # Runs forever until we stop
             while True:
                 self.one_step(sign)
                 time.sleep(delay)
+        # We listen for Ctrl+C, so the program does not crash but instead exits normally
         except KeyboardInterrupt:
             print("Stopped total_steps =", self.total_steps)
         finally:

@@ -6,9 +6,9 @@ import time
 from stepper_motor import StepperMotor
 
 # ---------------- SETTINGS - change these ----------------
-TEST = 1  # which test to run (see list below)
+TEST = 4  # which test to run (see list below) bhjmk
 MICROSTEPS = 8  # microsteps per full step, used in tests 4 and 6
-MOTOR_PWM = 0.5  # PWM for motor tests (start at 0.5, raise if weak)
+MOTOR_PWM = 0.65  # PWM for motor tests (start at 0.5, raise if weak)
 # ---------------------------------------------------------
 
 # 1  LEDs  full step forward/backward + total_steps
@@ -21,17 +21,22 @@ MOTOR_PWM = 0.5  # PWM for motor tests (start at 0.5, raise if weak)
 
 if TEST == 5 or TEST == 6:
     motor = StepperMotor([0, 1, 2, 3], pwm_pct=MOTOR_PWM)  # motor
+
 else:
     motor = StepperMotor([16, 17, 18, 19], pwm_pct=0.5)  # LEDs
 
 try:
     if TEST == 1:
-        print("TEST 1: full step on LEDs")
+        """print("TEST 1: full step on LEDs")
         motor.set_step_mode("full")
-        motor.move_stepper(8, "forward", delay=0.3)
-        print("total_steps after forward:", motor.total_steps)  # 8
-        motor.move_stepper(8, "backward", delay=0.3)
-        print("total_steps after backward:", motor.total_steps)  # 0
+        motor.move_stepper(200, "forward", delay=0.3)
+        print("total_steps after forward:", motor.total_steps)    # 8
+        motor.move_stepper(200, "backward", delay=0.3)
+        print("total_steps after backward:", motor.total_steps)   # 0"""
+
+        motor.set_step_mode("full")
+        motor.move_stepper(200, "forward", delay=0.01)
+        print("total_steps after forward:", motor.total_steps)
 
     elif TEST == 2:
         print("TEST 2: continuous rotation on LEDs")
